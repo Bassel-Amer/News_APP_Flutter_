@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:newsapp/features/homescreen/logic/cubit/get_news_cubit.dart';
 import 'package:newsapp/features/homescreen/ui/screens/detailscreen.dart';
+import 'package:shimmer/shimmer.dart';
 
 class Homescreen extends StatefulWidget {
   const Homescreen({super.key});
@@ -11,12 +12,37 @@ class Homescreen extends StatefulWidget {
 }
 
 class _HomescreenState extends State<Homescreen> {
-  // @override
-  // initState() {
-  //   super.initState();
-  //   // Fetch news for the default category when the screen initializes
-  //   context.read<GetNewsCubit>().fetchnews('general');
-  // }
+  final ScrollController _scrollController = ScrollController();
+  bool _showFab = false;
+
+  @override
+  initState() {
+    super.initState();
+
+    context.read<GetNewsCubit>().fetchnews('general');
+
+    _scrollController.addListener(() {
+      if (_scrollController.offset > 200 && !_showFab) {
+        setState(() => _showFab = true);
+      } else if (_scrollController.offset <= 200 && _showFab) {
+        setState(() => _showFab = false);
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _scrollController.dispose();
+  }
+
+  void _scrollToTop() {
+    _scrollController.animateTo(
+      0,
+      duration: Duration(milliseconds: 1000),
+      curve: Curves.easeInOut,
+    );
+  }
 
   int selectedCategoryIndex = 0;
   List<String> categories = [
@@ -32,9 +58,25 @@ class _HomescreenState extends State<Homescreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButton:
+          _showFab
+              ? FloatingActionButton(
+                onPressed: _scrollToTop,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(30),
+                ),
+                backgroundColor: Colors.red[900],
+                child: Icon(
+                  Icons.arrow_drop_up_sharp,
+                  color: Colors.white,
+                  size: 45,
+                ),
+              )
+              : null,
       body: BlocBuilder<GetNewsCubit, GetNewsState>(
         builder: (context, state) {
           return CustomScrollView(
+            controller: _scrollController,
             slivers: [
               SliverAppBar(
                 bottom: PreferredSize(
@@ -43,7 +85,7 @@ class _HomescreenState extends State<Homescreen> {
                 ),
                 flexibleSpace: FlexibleSpaceBar(
                   title: Text(
-                    'Pules News',
+                    'News Express',
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
 
@@ -125,12 +167,19 @@ class _HomescreenState extends State<Homescreen> {
               ),
 
               if (state is GetNewsLoading)
-                SliverFillRemaining(
-                  child: Center(child: CircularProgressIndicator()),
+                SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) => buildNewsShimmer(),
+                    childCount: 5,
+                  ),
                 ),
 
               if (state is GetNewsError)
-                SliverFillRemaining(child: Center(child: Text(state.error))),
+                SliverFillRemaining(
+                  child: Center(
+                    child: Text(state.error, style: TextStyle(fontSize: 18)),
+                  ),
+                ),
 
               if (state is GetNewsLoaded)
                 SliverList(
@@ -265,4 +314,36 @@ class NewsCard extends StatelessWidget {
       ),
     );
   }
+}
+
+Widget buildNewsShimmer() {
+  return Shimmer.fromColors(
+    baseColor: Colors.grey[300]!,
+    highlightColor: Colors.grey[100]!,
+    child: Card(
+      margin: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      // shadowColor: Colors.red,
+      elevation: 10,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      child: Column(
+        // crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
+
+            child: Container(
+              height: 200,
+              width: double.infinity,
+              color: Colors.grey[300],
+            ),
+          ),
+
+          Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: Column(children: [SizedBox(height: 8), SizedBox(height: 8)]),
+          ),
+        ],
+      ),
+    ),
+  );
 }
