@@ -1,10 +1,14 @@
-# News_APP_Flutter_
 
-# 📰 Pulse News
+# 📰 News Express
 
 A modern, responsive news application built with Flutter that delivers real-time top headlines across multiple categories. 
 
-![Pulse News Demo](link_to_your_gif_or_video_here.gif)
+
+https://github.com/user-attachments/assets/a69e9ce8-ac6f-460a-91a7-44a2a69ae4ae
+
+
+
+
 
 ## ✨ Features
 * **Real-Time Data:** Fetches live news articles using the [NewsAPI](https://newsapi.org/).
@@ -12,11 +16,14 @@ A modern, responsive news application built with Flutter that delivers real-time
 * **Responsive UI:** Built with custom slivers (`CustomScrollView`, `SliverAppBar`) for a fluid, native-feeling scrolling experience.
 * **Robust Error Handling:** Safely handles broken image links, missing data, and loading states without crashing.
 
+
 ## 🛠 Tech Stack & Tools
 * **Framework:** Flutter / Dart
 * **State Management:** BLoC / Cubit (`flutter_bloc`)
-* **Networking:** Standard `http` (or `dio` if you used it)
+* **Networking:** `dio`
+* **Packages:** shimmer ,
 * **Architecture:** Feature-Driven Development (FDD)
+
 
 ## 🏗 Architecture 
 This project is structured using a **Feature-First Architecture** combined with a clean separation of concerns. 
@@ -25,7 +32,10 @@ Instead of grouping files by their type (all models together, all screens togeth
 1. **Presentation Layer:** Stateless UI widgets and dynamic routing.
 2. **Business Logic Layer:** Cubits handling state emission and API communication.
 3. **Data Layer:** Repositories and Web Services managing data fetching and parsing.
+
+
    
+
 
 ## 🚀 Getting Started
 
