@@ -21,7 +21,7 @@ https://github.com/user-attachments/assets/a69e9ce8-ac6f-460a-91a7-44a2a69ae4ae
 * **Framework:** Flutter / Dart
 * **State Management:** BLoC / Cubit (`flutter_bloc`)
 * **Networking:** `dio`
-* **Packages:** shimmer ,
+* **Packages:** `shimmer` ,
 * **Architecture:** Feature-Driven Development (FDD)
 
 
@@ -45,4 +45,5 @@ To run this project locally, you will need a free API key from NewsAPI.
 2. Get a free API key at https://newsapi.org/
 3. Open the project and navigate to the webservices.dart 
 4. Insert your API key
-5. Run the app
+5. flutter pub get
+6. Run the app
