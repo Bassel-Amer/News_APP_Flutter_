@@ -33,7 +33,7 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_bloc: ^9.1.1
-  # A package provides an easy way to add shimmer effect in Flutter project
+  shared_preferences: ^2.5.5
   shimmer: ^3.0.0
 
 dev_dependencies:

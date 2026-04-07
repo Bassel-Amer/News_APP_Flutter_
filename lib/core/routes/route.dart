@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:newsapp/features/homescreen/data/repo.dart';
-import 'package:newsapp/features/homescreen/data/webservices.dart';
-import 'package:newsapp/features/homescreen/logic/cubit/get_news_cubit.dart';
+import 'package:newsapp/features/homescreen/ui/screens/detailscreen.dart';
+// import 'package:flutter_bloc/flutter_bloc.dart';
+// import 'package:newsapp/features/homescreen/data/repo.dart';
+// import 'package:newsapp/features/homescreen/data/webservices.dart';
+// import 'package:newsapp/features/homescreen/logic/cubit/get_news_cubit.dart';
 
 import 'package:newsapp/features/homescreen/ui/screens/homescreen.dart';
 
@@ -12,11 +13,22 @@ class RouterOfPages {
       case "/":
         return MaterialPageRoute(
           builder:
-              (_) => BlocProvider(
-                create:
-                    (context) =>
-                        GetNewsCubit(Repo(Webservices()))..fetchnews('general'),
-                child: Homescreen(),
+              (_) =>
+                  // BlocProvider(
+                  //   create: (context) => GetNewsCubit(Repo(Webservices())),
+                  //   // ..fetchnews('general'),
+                  //   child:
+                  Homescreen(),
+        );
+      case "/details":
+        final arg = settings.arguments as DataArticle;
+
+        return MaterialPageRoute(
+          builder:
+              (_) => ArticleDetailScreen(
+                imageUrl: arg.imageUrl,
+                title: arg.title,
+                content: arg.content,
               ),
         );
 
