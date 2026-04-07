@@ -15,13 +15,15 @@ https://github.com/user-attachments/assets/a69e9ce8-ac6f-460a-91a7-44a2a69ae4ae
 * **Dynamic Categories:** Seamlessly switch between General, Technology, Sports, Business, and more.
 * **Responsive UI:** Built with custom slivers (`CustomScrollView`, `SliverAppBar`) for a fluid, native-feeling scrolling experience.
 * **Robust Error Handling:** Safely handles broken image links, missing data, and loading states without crashing.
+* **Dark / Light Modes:** Let the user have the chance to change between Dark and Light Modes . 
+* **Local Storage:** Save the prefered settings the user choose (in this case the Themeing).
 
 
 ## 🛠 Tech Stack & Tools
 * **Framework:** Flutter / Dart
 * **State Management:** BLoC / Cubit (`flutter_bloc`)
 * **Networking:** `dio`
-* **Packages:** `shimmer` ,
+* **Packages:** `shimmer`,`Shared_prefrence`  ,
 * **Architecture:** Feature-Driven Development (FDD)
 
 
