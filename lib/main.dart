@@ -5,6 +5,7 @@ import 'package:newsapp/core/theme/app_theme.dart';
 import 'package:newsapp/core/theme/theme_cubit.dart';
 import 'package:newsapp/features/homescreen/data/repo.dart';
 import 'package:newsapp/features/homescreen/data/webservices.dart';
+import 'package:newsapp/features/homescreen/logic/cubit/cubit/search_news_cubit.dart';
 import 'package:newsapp/features/homescreen/logic/cubit/get_news_cubit.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -22,6 +23,7 @@ void main() async {
               (context) =>
                   GetNewsCubit(Repo(Webservices()))..fetchnews('general'),
         ),
+        BlocProvider(create: (context) => SearchNewsCubit(Repo(Webservices()))),
         BlocProvider(
           create: (context) => ThemeCubit(pref: pref, inittheme: savedtheme),
         ),
@@ -41,6 +43,7 @@ class MyApp extends StatelessWidget {
     return BlocBuilder<ThemeCubit, ThemeMode>(
       builder: (context, themeMode) {
         return MaterialApp(
+          debugShowCheckedModeBanner: false,
           theme: AppTheme.lightTheme,
           darkTheme: AppTheme.darkTheme,
           themeMode: themeMode,

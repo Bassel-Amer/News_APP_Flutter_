@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:newsapp/core/theme/theme_cubit.dart';
+import 'package:newsapp/features/homescreen/logic/cubit/cubit/search_news_cubit.dart';
 import 'package:newsapp/features/homescreen/logic/cubit/get_news_cubit.dart';
 import 'package:newsapp/features/homescreen/ui/screens/detailscreen.dart';
 // import 'package:newsapp/features/homescreen/ui/screens/detailscreen.dart';
@@ -17,11 +18,25 @@ class _HomescreenState extends State<Homescreen> {
   final ScrollController _scrollController = ScrollController();
   bool _showFab = false;
 
+  bool _isSearching = false;
+  final TextEditingController _searchController = TextEditingController();
+  final FocusNode _searchFocusNode = FocusNode();
+
+  Future<void> _fetchCategoryByIndex(int index) async {
+    selectedCategoryIndex = index;
+    await context.read<GetNewsCubit>().fetchnews(categories[index]);
+  }
+
   @override
   initState() {
     super.initState();
 
-    context.read<GetNewsCubit>().fetchnews('general');
+    // context.read<GetNewsCubit>().fetchnews('general');
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      _fetchCategoryByIndex(selectedCategoryIndex);
+    });
 
     _scrollController.addListener(() {
       if (_scrollController.offset > 200 && !_showFab) {
@@ -36,6 +51,8 @@ class _HomescreenState extends State<Homescreen> {
   void dispose() {
     super.dispose();
     _scrollController.dispose();
+    _searchFocusNode.dispose();
+    _searchController.dispose();
   }
 
   void _scrollToTop() {
@@ -60,10 +77,12 @@ class _HomescreenState extends State<Homescreen> {
   @override
   Widget build(BuildContext context) {
     return RefreshIndicator(
-      onRefresh:
-          () => context.read<GetNewsCubit>().fetchnews(
-            categories[selectedCategoryIndex],
-          ),
+      onRefresh: () => _fetchCategoryByIndex(selectedCategoryIndex),
+
+      // context.read<GetNewsCubit>().fetchnews(
+      //   categories[selectedCategoryIndex],
+      // ),
+
       // backgroundColor: Colors.black,
       color: Colors.red,
       displacement: 100,
@@ -86,137 +105,145 @@ class _HomescreenState extends State<Homescreen> {
                   ),
                 )
                 : null,
-        body: BlocBuilder<GetNewsCubit, GetNewsState>(
+        body:
+        // _isSearching
+        //     ? _buildSearchResults(
+        //       searchFocusNode,
+        //       searchController,
+        //       _scrollController,
+        //     )
+        // :
+        BlocBuilder<GetNewsCubit, GetNewsState>(
           builder: (context, state) {
             return CustomScrollView(
               controller: _scrollController,
               slivers: [
                 SliverAppBar(
-                  leading: IconButton(
-                    onPressed: () {
-                      context.read<ThemeCubit>().toggleTheme();
-                    },
-                    icon: Icon(Icons.brightness_6),
-                  ),
+                  pinned: true,
+                  floating: true,
+
                   bottom: PreferredSize(
-                    preferredSize: Size.fromHeight(0),
+                    preferredSize: Size.fromHeight(5),
                     child: Divider(color: Colors.red, thickness: 3, height: 5),
                   ),
-                  flexibleSpace: FlexibleSpaceBar(
-                    title: Text(
-                      'News Express',
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
+                  title:
+                      _isSearching
+                          ? TextField(
+                            controller: _searchController,
+                            focusNode: _searchFocusNode,
+                            decoration: const InputDecoration(
+                              hintText: 'Search keywords...',
+                              border: InputBorder.none,
+                              hintStyle: TextStyle(color: Colors.grey),
+                            ),
+                            textInputAction: TextInputAction.search,
 
-                    centerTitle: true,
-                  ),
-                  centerTitle: true,
-                  floating: true,
-                  // stretch: true,
-                  // snap: true,
+                            onSubmitted: (query) {
+                              if (query.isNotEmpty) {
+                                context.read<SearchNewsCubit>().searchNews(
+                                  query,
+                                );
+                              }
+                            },
+                          )
+                          : Text(
+                            'News Express',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 22,
+                            ),
+                          ),
+
+                  centerTitle: !_isSearching,
+
+                  actions: [
+                    if (_isSearching)
+                      IconButton(
+                        icon: const Icon(Icons.close),
+                        onPressed: () {
+                          setState(() {
+                            _isSearching = false;
+                            _searchController.clear();
+                          });
+                          FocusScope.of(context).unfocus();
+                          _fetchCategoryByIndex(selectedCategoryIndex);
+
+                          // context.read<SearchNewsCubit>().searchNews(
+                          //   categories[selectedCategoryIndex],
+                          // );
+                        },
+                      )
+                    else
+                      IconButton(
+                        icon: const Icon(Icons.search),
+                        onPressed: () {
+                          setState(() {
+                            _isSearching = true;
+                          });
+                          _searchFocusNode.requestFocus();
+                        },
+                      ),
+                  ],
+                  leading:
+                      !_isSearching
+                          ? IconButton(
+                            icon: const Icon(Icons.brightness_6),
+                            onPressed: () {
+                              context.read<ThemeCubit>().toggleTheme();
+                            },
+                          )
+                          : null,
                 ),
 
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16.0,
-                      vertical: 5,
-                    ),
-                    child: SizedBox(
-                      width: double.infinity,
-                      height: 50,
-                      child: ListView.builder(
-                        shrinkWrap: true,
-                        // physics: NeverScrollableScrollPhysics(),
-                        scrollDirection: Axis.horizontal,
-                        itemCount: categories.length,
-                        // separatorBuilder: (context, index) => SizedBox(width: 10),
-                        itemBuilder:
-                            (context, index) => Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8.0,
-                              ),
-                              child: ChoiceChip(
-                                avatar:
-                                    index == selectedCategoryIndex
-                                        ? Icon(
-                                          Icons.check_circle,
-                                          color: Colors.red[600],
-                                          size: 20,
-                                        )
-                                        : null,
+                // _isSearching
+                //     ? _buildSearchResults(
+                //       searchFocusNode,
+                //       searchController,
+                //       _scrollController,
+                //     )
+                // //     :
+                if (_isSearching)
+                  _buildSearchResults()
+                // Method returns a Sliver
+                // The "Spread" operator allows us to show multiple slivers for the home view
+                // _buildCategoryChipsSliver(),
+                else ...[
+                  _buildCategoryChipsSliver(),
 
-                                color:
-                                    index == selectedCategoryIndex
-                                        ? WidgetStateProperty.all(
-                                          Colors.black87,
-                                        )
-                                        : WidgetStateProperty.all(
-                                          Colors.grey[300],
-                                        ),
-                                label: Text(
-                                  categories[index][0].toUpperCase() +
-                                      categories[index].substring(1),
-                                  style: TextStyle(
-                                    color:
-                                        index == selectedCategoryIndex
-                                            ? Colors.white
-                                            : Colors.black,
-                                    fontSize: 14,
-                                    fontWeight:
-                                        index == selectedCategoryIndex
-                                            ? FontWeight.bold
-                                            : FontWeight.normal,
-                                  ),
-                                ),
-                                selected: index == selectedCategoryIndex,
-                                onSelected: (selected) {
-                                  if (selected) {
-                                    setState(() {
-                                      selectedCategoryIndex = index;
-                                    });
-                                    context.read<GetNewsCubit>().fetchnews(
-                                      categories[index],
-                                    );
-                                  }
-                                },
-                              ),
-                            ),
+                  if (state is GetNewsLoading)
+                    SliverList(
+                      delegate: SliverChildBuilderDelegate(
+                        (context, index) => buildNewsShimmer(),
+                        childCount: 5,
                       ),
                     ),
-                  ),
-                ),
 
-                if (state is GetNewsLoading)
-                  SliverList(
-                    delegate: SliverChildBuilderDelegate(
-                      (context, index) => buildNewsShimmer(),
-                      childCount: 5,
+                  if (state is GetNewsError)
+                    SliverFillRemaining(
+                      child: Center(
+                        child: Text(
+                          state.error,
+                          style: TextStyle(fontSize: 18),
+                        ),
+                      ),
                     ),
-                  ),
 
-                if (state is GetNewsError)
-                  SliverFillRemaining(
-                    child: Center(
-                      child: Text(state.error, style: TextStyle(fontSize: 18)),
+                  if (state is GetNewsLoaded)
+                    SliverList(
+                      delegate: SliverChildBuilderDelegate(
+                        childCount: state.news.length,
+                        (context, index) {
+                          final article = state.news[index];
+                          return NewsCard(
+                            imageUrl: article.urlToImage ?? '',
+                            title: article.title ?? 'No Title',
+                            description: article.description,
+                            content: article.content,
+                          );
+                        },
+                      ),
                     ),
-                  ),
-
-                if (state is GetNewsLoaded)
-                  SliverList(
-                    delegate: SliverChildBuilderDelegate(
-                      childCount: state.news.length,
-                      (context, index) {
-                        final article = state.news[index];
-                        return NewsCard(
-                          imageUrl: article.urlToImage ?? '',
-                          title: article.title ?? 'No Title',
-                          description: article.description,
-                          content: article.content,
-                        );
-                      },
-                    ),
-                  ),
+                ],
               ],
             );
           },
@@ -224,6 +251,121 @@ class _HomescreenState extends State<Homescreen> {
       ),
     );
   }
+
+  Widget _buildCategoryChipsSliver() {
+    return SliverToBoxAdapter(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 7),
+        child: SizedBox(
+          width: double.infinity,
+          height: 50,
+          child: ListView.builder(
+            shrinkWrap: true,
+            // physics: NeverScrollableScrollPhysics(),
+            scrollDirection: Axis.horizontal,
+            itemCount: categories.length,
+            // separatorBuilder: (context, index) => SizedBox(width: 10),
+            itemBuilder:
+                (context, index) => Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  child: ChoiceChip(
+                    avatar:
+                        index == selectedCategoryIndex
+                            ? Icon(
+                              Icons.check_circle,
+                              color: Colors.red[600],
+                              size: 20,
+                            )
+                            : null,
+
+                    color:
+                        index == selectedCategoryIndex
+                            ? WidgetStateProperty.all(Colors.black87)
+                            : WidgetStateProperty.all(Colors.grey[300]),
+                    label: Text(
+                      categories[index][0].toUpperCase() +
+                          categories[index].substring(1),
+                      style: TextStyle(
+                        color:
+                            index == selectedCategoryIndex
+                                ? Colors.white
+                                : Colors.black,
+                        fontSize: 14,
+                        fontWeight:
+                            index == selectedCategoryIndex
+                                ? FontWeight.bold
+                                : FontWeight.normal,
+                      ),
+                    ),
+                    selected: index == selectedCategoryIndex,
+                    onSelected: (selected) {
+                      if (selected) {
+                        setState(() {
+                          selectedCategoryIndex = index;
+                          // ---------------------]
+                          _isSearching = false;
+                          _searchController.clear();
+                        });
+
+                        FocusScope.of(context).unfocus();
+                        _fetchCategoryByIndex(index);
+                        // context.read<GetNewsCubit>().fetchnews(
+                        //   categories[index],
+                        // );
+                      }
+                    },
+                  ),
+                ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+Widget _buildSearchResults() {
+  // final TextEditingController _searchController = TextEditingController();
+  // final FocusNode searchFocusNode = FocusNode();
+
+  return BlocBuilder<SearchNewsCubit, SearchNewsState>(
+    builder: (context, state) {
+      if (state is SearchNewsLoading) {
+        return SliverList(
+          delegate: SliverChildBuilderDelegate(
+            (context, index) => buildNewsShimmer(),
+            childCount: 5,
+          ),
+        );
+      }
+
+      if (state is SearchNewsError) {
+        return SliverFillRemaining(
+          child: Center(
+            child: Text(state.error, style: TextStyle(fontSize: 18)),
+          ),
+        );
+      }
+      if (state is SearchNewsLoaded) {
+        return SliverList(
+          delegate: SliverChildBuilderDelegate(childCount: state.news.length, (
+            context,
+            index,
+          ) {
+            final article = state.news[index];
+            return NewsCard(
+              imageUrl: article.urlToImage ?? '',
+              title: article.title ?? 'No Title',
+              description: article.description,
+              content: article.content,
+            );
+          }),
+        );
+      }
+      return const SliverFillRemaining(
+        child: Center(child: Text("Type to search...")),
+      );
+    },
+  );
 }
 
 class NewsCard extends StatelessWidget {

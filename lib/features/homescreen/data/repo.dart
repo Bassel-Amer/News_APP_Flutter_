@@ -19,6 +19,12 @@ class Repo {
 
     return newsData;
   }
+
+  Future<NewsData> searchNews({required String keywords}) async {
+    final rowData = await webservices.searchNews(keywords: keywords);
+
+    final newsData = NewsData.fromJson(rowData);
+
+    return newsData;
+  }
 }
-
-

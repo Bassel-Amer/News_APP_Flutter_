@@ -46,7 +46,22 @@ class Webservices {
       return {};
     }
   }
+
+  Future<Map<String, dynamic>> searchNews({required String keywords}) async {
+    try {
+      Response response = await dio.get(
+        'everything',
+        queryParameters: {
+          "apiKey": "9bd498111e3d402fb2103e2dc16d9e92",
+          'q': keywords,
+        },
+      );
+
+      return response.data;
+    } on DioException catch (e) {
+      print('Error: ${e.message}');
+
+      return {};
+    }
+  }
 }
-
-
-
