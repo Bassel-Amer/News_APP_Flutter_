@@ -4,7 +4,11 @@
 A modern, responsive news application built with Flutter that delivers real-time top headlines across multiple categories. 
 
 
-https://github.com/user-attachments/assets/a69e9ce8-ac6f-460a-91a7-44a2a69ae4ae
+
+
+https://github.com/user-attachments/assets/41ef35c0-8b26-4eef-b2fd-fabe2812db10
+
+
 
 
 
@@ -36,7 +40,31 @@ Instead of grouping files by their type (all models together, all screens togeth
 3. **Data Layer:** Repositories and Web Services managing data fetching and parsing.
 
 
-   
+   lib/
+├── core/
+│   ├── const/
+│   ├── theme/
+│   └── routes/
+|
+└── features/
+    ├── home/
+    │   ├── business_logic/
+    │   │   └── home_cubit.dart
+    │   └── presentation/
+    │       ├── screens/
+    │       └── widgets/
+    ├── search/
+    │   ├── business_logic/
+    │   │   └── search_cubit.dart
+    │   └── presentation/
+    │       ├── screens/
+    │       └── widgets/
+    └── settings/
+        ├── business_logic/
+        │   └── theme_cubit.dart
+        └── presentation/
+            └── screens/
+
 
 
 ## 🚀 Getting Started
