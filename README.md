@@ -15,12 +15,14 @@ https://github.com/user-attachments/assets/41ef35c0-8b26-4eef-b2fd-fabe2812db10
 
 
 ## ✨ Features
+
+* **Global Search:** Find specific stories instantly by typing keywords to search through millions of articles.
 * **Real-Time Data:** Fetches live news articles using the [NewsAPI](https://newsapi.org/).
 * **Dynamic Categories:** Seamlessly switch between General, Technology, Sports, Business, and more.
 * **Responsive UI:** Built with custom slivers (`CustomScrollView`, `SliverAppBar`) for a fluid, native-feeling scrolling experience.
+* **Dark / Light Modes:** Personalized viewing experience with easy toggling between themes. . 
+* **Local Storage:** Remembers user preferences (like Theme mode) across sessions using persistent storage.
 * **Robust Error Handling:** Safely handles broken image links, missing data, and loading states without crashing.
-* **Dark / Light Modes:** Let the user have the chance to change between Dark and Light Modes . 
-* **Local Storage:** Save the prefered settings the user choose (in this case the Themeing).
 
 
 ## 🛠 Tech Stack & Tools
@@ -39,31 +41,6 @@ Instead of grouping files by their type (all models together, all screens togeth
 2. **Business Logic Layer:** Cubits handling state emission and API communication.
 3. **Data Layer:** Repositories and Web Services managing data fetching and parsing.
 
-
-   lib/
-├── core/
-│   ├── const/
-│   ├── theme/
-│   └── routes/
-|
-└── features/
-    ├── home/
-    │   ├── business_logic/
-    │   │   └── home_cubit.dart
-    │   └── presentation/
-    │       ├── screens/
-    │       └── widgets/
-    ├── search/
-    │   ├── business_logic/
-    │   │   └── search_cubit.dart
-    │   └── presentation/
-    │       ├── screens/
-    │       └── widgets/
-    └── settings/
-        ├── business_logic/
-        │   └── theme_cubit.dart
-        └── presentation/
-            └── screens/
 
 
 
