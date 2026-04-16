@@ -2,7 +2,7 @@ import 'package:dio/dio.dart';
 
 import 'package:newsapp/core/consts/consts.dart';
 
-String apiKey = "9bd498111e3d402fb2103e2dc16d9e92";
+String apiKey = "Your API Key";
 
 class Webservices {
   late Dio dio;
@@ -53,6 +53,7 @@ class Webservices {
     try {
       Response response = await dio.get(
         'everything',
+
         queryParameters: {"apiKey": apiKey, 'q': keywords},
       );
 
