@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:newsapp/core/theme/theme_cubit.dart';
 import 'package:newsapp/features/homescreen/logic/cubit/cubit/search_news_cubit.dart';
 import 'package:newsapp/features/homescreen/logic/cubit/get_news_cubit.dart';
-import 'package:newsapp/features/homescreen/ui/screens/detailscreen.dart';
-// import 'package:newsapp/features/homescreen/ui/screens/detailscreen.dart';
-import 'package:shimmer/shimmer.dart';
+import 'package:newsapp/features/homescreen/ui/widgets/news_card.dart';
+import 'package:newsapp/features/homescreen/ui/widgets/news_search_result.dart';
+import 'package:newsapp/features/homescreen/ui/widgets/news_shimmer.dart';
 
 class Homescreen extends StatefulWidget {
   const Homescreen({super.key});
@@ -76,6 +77,8 @@ class _HomescreenState extends State<Homescreen> {
 
   @override
   Widget build(BuildContext context) {
+    final actualWidth = MediaQuery.of(context).size.width;
+
     return RefreshIndicator(
       onRefresh: () => _fetchCategoryByIndex(selectedCategoryIndex),
 
@@ -101,7 +104,7 @@ class _HomescreenState extends State<Homescreen> {
                   child: Icon(
                     Icons.arrow_drop_up_sharp,
                     color: Colors.white,
-                    size: 45,
+                    size: 45.sp,
                   ),
                 )
                 : null,
@@ -124,7 +127,11 @@ class _HomescreenState extends State<Homescreen> {
 
                   bottom: PreferredSize(
                     preferredSize: Size.fromHeight(5),
-                    child: Divider(color: Colors.red, thickness: 3, height: 5),
+                    child: Divider(
+                      color: Colors.red,
+                      thickness: 3.h,
+                      height: 3.h,
+                    ),
                   ),
                   title:
                       _isSearching
@@ -150,7 +157,7 @@ class _HomescreenState extends State<Homescreen> {
                             'News Express',
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
-                              fontSize: 22,
+                              fontSize: 22.sp,
                             ),
                           ),
 
@@ -175,7 +182,7 @@ class _HomescreenState extends State<Homescreen> {
                       )
                     else
                       IconButton(
-                        icon: const Icon(Icons.search),
+                        icon: Icon(Icons.search, size: 22.sp),
                         onPressed: () {
                           setState(() {
                             _isSearching = true;
@@ -187,7 +194,7 @@ class _HomescreenState extends State<Homescreen> {
                   leading:
                       !_isSearching
                           ? IconButton(
-                            icon: const Icon(Icons.brightness_6),
+                            icon: Icon(Icons.brightness_6, size: 22.sp),
                             onPressed: () {
                               context.read<ThemeCubit>().toggleTheme();
                             },
@@ -195,54 +202,86 @@ class _HomescreenState extends State<Homescreen> {
                           : null,
                 ),
 
-                // _isSearching
-                //     ? _buildSearchResults(
-                //       searchFocusNode,
-                //       searchController,
-                //       _scrollController,
-                //     )
-                // //     :
                 if (_isSearching)
-                  _buildSearchResults()
-                // Method returns a Sliver
-                // The "Spread" operator allows us to show multiple slivers for the home view
-                // _buildCategoryChipsSliver(),
+                  buildSearchResults(actualWidth)
                 else ...[
                   _buildCategoryChipsSliver(),
 
                   if (state is GetNewsLoading)
-                    SliverList(
-                      delegate: SliverChildBuilderDelegate(
-                        (context, index) => buildNewsShimmer(),
-                        childCount: 5,
-                      ),
-                    ),
+                    actualWidth < 800
+                        ? SliverList(
+                          delegate: SliverChildBuilderDelegate(
+                            (context, index) => buildNewsShimmer(
+                              ThemeMode.light ==
+                                  context.watch<ThemeCubit>().state,
+                            ),
+                            childCount: 5,
+                          ),
+                        )
+                        : SliverGrid(
+                          gridDelegate:
+                              SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: actualWidth < 835 ? 2 : 3,
+                                mainAxisSpacing: 10.h,
+                                crossAxisSpacing: 10.w,
+                                childAspectRatio: 0.75,
+                              ),
+                          delegate: SliverChildBuilderDelegate(
+                            (context, index) => buildNewsShimmer(
+                              ThemeMode.light ==
+                                  context.watch<ThemeCubit>().state,
+                            ),
+                            childCount: 6,
+                          ),
+                        ),
 
                   if (state is GetNewsError)
                     SliverFillRemaining(
                       child: Center(
                         child: Text(
                           state.error,
-                          style: TextStyle(fontSize: 18),
+                          style: TextStyle(fontSize: 18.sp),
                         ),
                       ),
                     ),
 
                   if (state is GetNewsLoaded)
-                    SliverList(
-                      delegate: SliverChildBuilderDelegate(
-                        childCount: state.news.length,
-                        (context, index) {
-                          final article = state.news[index];
-                          return NewsCard(
-                            imageUrl: article.urlToImage ?? '',
-                            title: article.title ?? 'No Title',
-                            description: article.description,
-                            content: article.content,
-                          );
-                        },
-                      ),
-                    ),
+                    actualWidth < 800
+                        ? SliverList(
+                          delegate: SliverChildBuilderDelegate(
+                            childCount: state.news.length,
+                            (context, index) {
+                              final article = state.news[index];
+                              return NewsCard(
+                                imageUrl: article.urlToImage ?? '',
+                                title: article.title ?? 'No Title',
+                                description: article.description,
+                                url: article.url,
+                              );
+                            },
+                          ),
+                        )
+                        : SliverGrid(
+                          gridDelegate:
+                              SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: actualWidth < 960 ? 2 : 3,
+                                mainAxisSpacing: 10.h,
+                                crossAxisSpacing: 10.w,
+                                childAspectRatio: 0.75,
+                              ),
+                          delegate: SliverChildBuilderDelegate(
+                            childCount: state.news.length,
+                            (context, index) {
+                              final article = state.news[index];
+                              return NewsCard(
+                                imageUrl: article.urlToImage ?? '',
+                                title: article.title ?? 'No Title',
+                                description: article.description,
+                                url: article.url,
+                              );
+                            },
+                          ),
+                        ),
                 ],
               ],
             );
@@ -253,12 +292,18 @@ class _HomescreenState extends State<Homescreen> {
   }
 
   Widget _buildCategoryChipsSliver() {
+    final actual_height = MediaQuery.of(context).size.height;
+    final actualWidth = MediaQuery.of(context).size.width;
+
     return SliverToBoxAdapter(
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 7),
+        padding:
+            actualWidth < 810
+                ? EdgeInsets.symmetric(horizontal: 16.0.w, vertical: 7.0.h)
+                : EdgeInsets.symmetric(horizontal: 56.0.w, vertical: 17.0.h),
         child: SizedBox(
           width: double.infinity,
-          height: 50,
+          height: actual_height * 0.07,
           child: ListView.builder(
             shrinkWrap: true,
             // physics: NeverScrollableScrollPhysics(),
@@ -267,14 +312,17 @@ class _HomescreenState extends State<Homescreen> {
             // separatorBuilder: (context, index) => SizedBox(width: 10),
             itemBuilder:
                 (context, index) => Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  padding:
+                      actualWidth < 810
+                          ? EdgeInsets.symmetric(horizontal: 8.0.w)
+                          : EdgeInsets.symmetric(horizontal: 18.0.w),
                   child: ChoiceChip(
                     avatar:
                         index == selectedCategoryIndex
                             ? Icon(
                               Icons.check_circle,
                               color: Colors.red[600],
-                              size: 20,
+                              size: 20.sp,
                             )
                             : null,
 
@@ -290,7 +338,7 @@ class _HomescreenState extends State<Homescreen> {
                             index == selectedCategoryIndex
                                 ? Colors.white
                                 : Colors.black,
-                        fontSize: 14,
+                        fontSize: 14.sp,
                         fontWeight:
                             index == selectedCategoryIndex
                                 ? FontWeight.bold
@@ -321,193 +369,4 @@ class _HomescreenState extends State<Homescreen> {
       ),
     );
   }
-}
-
-Widget _buildSearchResults() {
-  // final TextEditingController _searchController = TextEditingController();
-  // final FocusNode searchFocusNode = FocusNode();
-
-  return BlocBuilder<SearchNewsCubit, SearchNewsState>(
-    builder: (context, state) {
-      if (state is SearchNewsLoading) {
-        return SliverList(
-          delegate: SliverChildBuilderDelegate(
-            (context, index) => buildNewsShimmer(),
-            childCount: 5,
-          ),
-        );
-      }
-
-      if (state is SearchNewsError) {
-        return SliverFillRemaining(
-          child: Center(
-            child: Text(state.error, style: TextStyle(fontSize: 18)),
-          ),
-        );
-      }
-      if (state is SearchNewsLoaded) {
-        return SliverList(
-          delegate: SliverChildBuilderDelegate(childCount: state.news.length, (
-            context,
-            index,
-          ) {
-            final article = state.news[index];
-            return NewsCard(
-              imageUrl: article.urlToImage ?? '',
-              title: article.title ?? 'No Title',
-              description: article.description,
-              content: article.content,
-            );
-          }),
-        );
-      }
-      return const SliverFillRemaining(
-        child: Center(child: Text("Type to search...")),
-      );
-    },
-  );
-}
-
-class NewsCard extends StatelessWidget {
-  final String imageUrl;
-  final String title;
-  final String? description;
-  final String? content;
-  const NewsCard({
-    super.key,
-    required this.imageUrl,
-    required this.title,
-    this.description,
-    this.content,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        // 1. The Navigation Logic
-        Navigator.pushNamed(
-          context,
-          "/details",
-          arguments: DataArticle(
-            title: title,
-            imageUrl: imageUrl,
-            content: content,
-          ),
-        );
-      },
-      child: Card(
-        margin: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        // shadowColor: Colors.red,
-        elevation: 10,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        child: Column(
-          // crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            ClipRRect(
-              borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
-
-              child: Hero(
-                tag: imageUrl,
-                child:
-                    imageUrl.isNotEmpty
-                        ? Image.network(
-                          height: 200,
-                          width: double.infinity,
-                          fit: BoxFit.cover,
-                          imageUrl,
-                          frameBuilder:
-                              (context, child, frame, wasSynchronouslyLoaded) =>
-                                  wasSynchronouslyLoaded
-                                      ? child
-                                      : AnimatedOpacity(
-                                        opacity: frame == null ? 0 : 1,
-                                        duration: const Duration(seconds: 1),
-                                        child: child,
-                                      ),
-
-                          // loadingBuilder:
-                          //     (context, child, loadingProgress) =>
-                          //         Center(child: CircularProgressIndicator()),
-                          errorBuilder:
-                              (context, error, stackTrace) => Container(
-                                height: 200,
-                                width: double.infinity,
-                                color: Colors.grey[300],
-                                child: const Icon(Icons.broken_image),
-                              ),
-                        )
-                        : Container(
-                          height: 200,
-                          width: double.infinity,
-                          color: Colors.grey[300],
-                          child: Icon(
-                            Icons.image_not_supported,
-                            size: 50,
-                            color: Colors.grey[700],
-                          ),
-                        ),
-              ),
-            ),
-
-            Padding(
-              padding: const EdgeInsets.all(12.0),
-              child: Column(
-                children: [
-                  Text(
-                    // softWrap: true,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    title,
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-                  ),
-                  SizedBox(height: 8),
-                  Text(
-                    description ?? 'No Description Available',
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(color: Colors.grey[700], fontSize: 15),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-Widget buildNewsShimmer() {
-  return Shimmer.fromColors(
-    baseColor: Colors.grey[300]!,
-
-    highlightColor: Colors.grey[100]!,
-
-    child: Card(
-      margin: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      // shadowColor: Colors.red,
-      elevation: 10,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      child: Column(
-        // crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          ClipRRect(
-            borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
-
-            child: Container(
-              height: 200,
-              width: double.infinity,
-              color: Colors.grey[300],
-            ),
-          ),
-
-          Padding(
-            padding: const EdgeInsets.all(12.0),
-            child: Column(children: [SizedBox(height: 8), SizedBox(height: 8)]),
-          ),
-        ],
-      ),
-    ),
-  );
 }

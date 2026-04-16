@@ -28,7 +28,8 @@ class RouterOfPages {
               (_) => ArticleDetailScreen(
                 imageUrl: arg.imageUrl,
                 title: arg.title,
-                content: arg.content,
+                description: arg.description,
+                url: arg.url,
               ),
         );
 

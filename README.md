@@ -4,19 +4,25 @@
 A modern, responsive news application built with Flutter that delivers real-time top headlines across multiple categories. 
 
 
-https://github.com/user-attachments/assets/a69e9ce8-ac6f-460a-91a7-44a2a69ae4ae
+
+
+https://github.com/user-attachments/assets/41ef35c0-8b26-4eef-b2fd-fabe2812db10
+
+
 
 
 
 
 
 ## ✨ Features
+
+* **Global Search:** Find specific stories instantly by typing keywords to search through millions of articles.
 * **Real-Time Data:** Fetches live news articles using the [NewsAPI](https://newsapi.org/).
 * **Dynamic Categories:** Seamlessly switch between General, Technology, Sports, Business, and more.
 * **Responsive UI:** Built with custom slivers (`CustomScrollView`, `SliverAppBar`) for a fluid, native-feeling scrolling experience.
+* **Dark / Light Modes:** Personalized viewing experience with easy toggling between themes. . 
+* **Local Storage:** Remembers user preferences (like Theme mode) across sessions using persistent storage.
 * **Robust Error Handling:** Safely handles broken image links, missing data, and loading states without crashing.
-* **Dark / Light Modes:** Let the user have the chance to change between Dark and Light Modes . 
-* **Local Storage:** Save the prefered settings the user choose (in this case the Themeing).
 
 
 ## 🛠 Tech Stack & Tools
@@ -36,7 +42,6 @@ Instead of grouping files by their type (all models together, all screens togeth
 3. **Data Layer:** Repositories and Web Services managing data fetching and parsing.
 
 
-   
 
 
 ## 🚀 Getting Started

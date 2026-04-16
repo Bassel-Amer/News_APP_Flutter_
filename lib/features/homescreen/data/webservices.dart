@@ -2,6 +2,8 @@ import 'package:dio/dio.dart';
 
 import 'package:newsapp/core/consts/consts.dart';
 
+String apiKey = "9bd498111e3d402fb2103e2dc16d9e92";
+
 class Webservices {
   late Dio dio;
 
@@ -34,7 +36,7 @@ class Webservices {
         'top-headlines',
         queryParameters: {
           "country": country,
-          "apiKey": "9bd498111e3d402fb2103e2dc16d9e92",
+          "apiKey": apiKey,
           'category': category,
         },
       );
@@ -51,10 +53,7 @@ class Webservices {
     try {
       Response response = await dio.get(
         'everything',
-        queryParameters: {
-          "apiKey": "9bd498111e3d402fb2103e2dc16d9e92",
-          'q': keywords,
-        },
+        queryParameters: {"apiKey": apiKey, 'q': keywords},
       );
 
       return response.data;
