@@ -6,7 +6,12 @@ A modern, responsive news application built with Flutter that delivers real-time
 
 
 
-https://github.com/user-attachments/assets/41ef35c0-8b26-4eef-b2fd-fabe2812db10
+
+https://github.com/user-attachments/assets/d03102d2-5595-4672-85b6-f02a1bcff8b3
+
+
+
+
 
 
 
@@ -20,16 +25,18 @@ https://github.com/user-attachments/assets/41ef35c0-8b26-4eef-b2fd-fabe2812db10
 * **Real-Time Data:** Fetches live news articles using the [NewsAPI](https://newsapi.org/).
 * **Dynamic Categories:** Seamlessly switch between General, Technology, Sports, Business, and more.
 * **Responsive UI:** Built with custom slivers (`CustomScrollView`, `SliverAppBar`) for a fluid, native-feeling scrolling experience.
+* **Scalable UI Design:** Utilizes `flutter_screenutil` and `MediaQuery` to ensure pixel-perfect typography and spacing across varying screen densities
 * **Dark / Light Modes:** Personalized viewing experience with easy toggling between themes. . 
 * **Local Storage:** Remembers user preferences (like Theme mode) across sessions using persistent storage.
 * **Robust Error Handling:** Safely handles broken image links, missing data, and loading states without crashing.
+* **External Article Access:** Integrated `url_launcher` allowing users to jump from the app summary to the full source article in their native browser
 
 
 ## 🛠 Tech Stack & Tools
 * **Framework:** Flutter / Dart
 * **State Management:** BLoC / Cubit (`flutter_bloc`)
 * **Networking:** `dio`
-* **Packages:** `shimmer`,`Shared_prefrence`  ,
+* **Packages:** `shimmer`,`Shared_prefrence`,`url_launcher`,`flutter_screenutil`
 * **Architecture:** Feature-Driven Development (FDD)
 
 
